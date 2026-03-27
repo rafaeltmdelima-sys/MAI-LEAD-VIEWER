@@ -14,6 +14,13 @@ async function startServer() {
   app.use(cors());
   app.use(express.json());
 
+  // Middleware to allow iframe embedding
+  app.use((req, res, next) => {
+    res.setHeader("Content-Security-Policy", "frame-ancestors *");
+    res.removeHeader("X-Frame-Options");
+    next();
+  });
+
   // Proxy route for the webhook
   app.post("/api/proxy-webhook", async (req, res) => {
     const WEBHOOK_URL = 'https://vmi3144263.contaboserver.net/webhook/55d004de-ffe4-44ad-81bd-e41146d237e0';
