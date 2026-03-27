@@ -93,7 +93,8 @@ export default function App() {
     const query = searchQuery.toLowerCase();
     return leads.filter(lead => 
       lead.telefone?.toString().toLowerCase().includes(query) ||
-      lead.nome?.toLowerCase().includes(query)
+      lead.nome?.toLowerCase().includes(query) ||
+      lead.status?.toLowerCase().includes(query)
     );
   }, [leads, searchQuery]);
 
@@ -218,7 +219,7 @@ export default function App() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
           <input
             type="text"
-            placeholder="Buscar telefone"
+            placeholder="Buscar nome, tel ou status"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full h-10 pl-10 pr-4 bg-gray-50 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
