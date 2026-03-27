@@ -37,6 +37,7 @@ export default function App() {
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [notification, setNotification] = useState<{ type: 'success' | 'error', message: string } | null>(null);
 
   // Form states for modal
   const [status, setStatus] = useState('');
@@ -126,9 +127,9 @@ export default function App() {
         observacao
       };
 
-      console.log('Enviando dados para o Webhook:', WEBHOOK_URL, payload);
+      console.log('Enviando dados para o Proxy Local...');
 
-      const response = await fetch(WEBHOOK_URL, {
+      const response = await fetch('/api/proxy-webhook', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -136,17 +137,18 @@ export default function App() {
         body: JSON.stringify(payload)
       });
 
-      console.log('Status da resposta:', response.status);
+      console.log('Status da resposta do proxy:', response.status);
 
       const result = await response.json();
-      console.log('Resultado do servidor:', result);
+      console.log('Resultado do proxy:', result);
 
       if (result.ok === false) {
         throw new Error(result.message || 'Erro ao salvar lead no servidor');
       }
 
       console.log('Lead salvo com sucesso');
-      alert('Lead atualizado com sucesso!');
+      setNotification({ type: 'success', message: 'Lead atualizado com sucesso!' });
+      setTimeout(() => setNotification(null), 3000);
 
       // Re-fetch leads to update list
       console.log('Atualizando lista de leads...');
@@ -161,11 +163,11 @@ export default function App() {
     } catch (error) {
       console.error('Erro detalhado ao enviar lead:', error);
       
-      if (error instanceof TypeError && error.message === 'Failed to fetch') {
-        alert('Erro de Conexão (CORS): O seu servidor Contabo bloqueou a requisição. Certifique-se de que o CORS está habilitado no servidor ou use um proxy.');
-      } else {
-        alert('Erro ao enviar lead: ' + (error instanceof Error ? error.message : 'Erro desconhecido'));
-      }
+      setNotification({ 
+        type: 'error', 
+        message: 'Erro ao enviar lead: ' + (error instanceof Error ? error.message : 'Erro desconhecido') 
+      });
+      setTimeout(() => setNotification(null), 5000);
     } finally {
       setIsSaving(false);
     }
@@ -194,6 +196,13 @@ export default function App() {
     <div className="h-screen bg-white text-gray-900 font-sans flex flex-col max-w-md mx-auto border-x border-gray-100 shadow-sm overflow-hidden">
       {/* TOP BAR */}
       <div className="sticky top-0 z-10 bg-white border-b border-gray-100 p-3 space-y-2 shrink-0">
+        {notification && (
+          <div className={`p-2 rounded-md text-xs font-medium text-center animate-in fade-in slide-in-from-top-2 ${
+            notification.type === 'success' ? 'bg-green-50 text-green-700 border border-green-100' : 'bg-red-50 text-red-700 border border-red-100'
+          }`}>
+            {notification.message}
+          </div>
+        )}
         <div className="flex items-center gap-2">
           <select
             value={selectedSeller}
