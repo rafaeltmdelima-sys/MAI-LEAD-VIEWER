@@ -25,7 +25,7 @@ const STATUS_OPTIONS = [
   'ORÇAMENTO',
   'FORA DE PERFIL',
   'EM PRODUÇÃO',
-  'FECHOU'
+  'FECHOU',
   'PERDIDO'
 ];
 
